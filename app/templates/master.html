@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/toastr.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fontawesome/css/all.min.css' %}">
+
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'js/toastr.min.js' %}"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head> 
+<body>
+
+    <div class="sidebar p-2" >
+        {% if user.is_authenticated %}
+        <p>Bienvenido, {{ user.username }} | <a href="{% url 'admin:logout' %}?next=/">Cerrar sesión</a></p>
+        {% endif %}
+
+        <h2>Opciones</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="home"><i class="fa-solid fa-house"></i> inicio</a>
+            </li>
+        </ul>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="admin"><i class="fa-solid fa-list"></i> Administracion</a>
+            </li>
+        </ul>
+        <ul class="nav flex-column">
+            <li>
+                <a href="Dashboards" class="nav-link"><i class="fa-solid fa-gauge"></i> Indicadores</a>
+            </li>
+        </ul>
+      
+    </div>
+
+      
+
+  
+
+
+{% block body %}
+{% endblock %}
+
+
+
+
+</body>
+
+
+</html>

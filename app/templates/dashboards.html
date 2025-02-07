@@ -1,0 +1,556 @@
+{% extends "./master.html" %} 
+{% block body %}
+{% load static %}
+
+<div class="content">
+    <div class="row"> 
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">1. Recaudación por mes en el 2024</h3>
+            <canvas id="graphIngresosMensual"></canvas>
+        </div>
+        &nbsp&nbsp&nbsp&nbsp
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">2. Recaudación por año</h3>
+            <canvas id="graphRecaudacionAnual"></canvas>
+        </div>
+    </div>
+<br><br><br>
+    <div class="row"> 
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">3. Total de facturación por socio</h3>
+            <canvas id="graphFacturacionSocios"></canvas>
+        </div>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <div class="col-md-6" style="width: 300px;">
+            <h3 class="text-center">4. Tipos de socios</h3>
+            <canvas id="graphTiposSocios"></canvas>
+        </div>
+    </div>
+
+
+    <br><br><br>
+    <div class="row"> 
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">5. Clientes con Mayor Consumo</h3>
+            <canvas id="graphClientesConsumo" ></canvas>
+        </div>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <div class="col-md-6" style="width: 350px;">
+            <h3 class="text-center">6. Medidores con Mayor Consumo</h3>
+            <canvas id="graphMedidoresConsumo" ></canvas>
+        </div>
+    </div>
+
+
+
+
+    <br><br><br>
+    <div class="row"> 
+        <div class="col-md-6" style="width: 350px;">
+            <h3 class="text-center">7. Día de la Semana con Más Asistencias</h3>
+            <canvas id="graphDiasAsistencias"></canvas>
+        </div>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">8. Crecimiento de Facturación Anual</h3>
+            <canvas id="graphCrecimientoFacturacion"></canvas>
+        </div>
+    </div>
+
+    <br><br><br>
+    <div class="row"> 
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">9. Socios con menor porcentage de participacion top 5</h3>
+            <canvas id="graphSociosMenosParticipativos"></canvas>
+        </div>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <div class="col-md-6" style="width: 500px;">
+            <h3 class="text-center">10. Socios con mayor recaudadicion</h3>
+            <canvas id="graphSociosMayorRecaudacion"></canvas>
+        </div>
+    </div>
+    
+
+    
+
+
+</div>
+
+
+<!-- GRAFICO 1 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosRecaudacionMensual = JSON.parse('{{ recaudacion_por_mes|escapejs }}');
+        const labelsRecaudacionMensual = datosRecaudacionMensual.map(item => item.mes);
+        const valoresRecaudacionMensual = datosRecaudacionMensual.map(item => item.total_ingresos);
+
+
+        const colores = {
+            "Enero": "#FF5733", "Febrero": "#FFBD33", "Marzo": "#FFD433", "Abril": "#A8FF33",
+            "Mayo": "#33FF57", "Junio": "#33FFBD", "Julio": "#33D4FF", "Agosto": "#3385FF",
+            "Septiembre": "#7A33FF", "Octubre": "#BD33FF", "Noviembre": "#FF33D4", "Diciembre": "#FF336E"
+        };
+        
+        const backgroundColors = labelsRecaudacionMensual.map(mes => colores[mes] || "#999999");
+
+        const ctx = document.getElementById('graphIngresosMensual').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',  
+            data: {
+                labels: labelsRecaudacionMensual,  
+                datasets: [{
+                    label: 'Recaudación ($)',
+                    data: valoresRecaudacionMensual,  
+                    backgroundColor: backgroundColors, 
+                    borderColor: backgroundColors,  
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+<!-- GRAFICO 2 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosRecaudacionAnual = JSON.parse('{{ recaudacion_anual|escapejs }}');
+        const labelsRecaudacionAnual = datosRecaudacionAnual.map(item => item.anio);
+        const valoresRecaudacionAnual = datosRecaudacionAnual.map(item => item.total_recaudacion);
+
+     
+        const ctx = document.getElementById('graphRecaudacionAnual').getContext('2d');
+
+    
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(54, 162, 235, 0.6)');
+        gradient.addColorStop(1, 'rgba(54, 162, 235, 0.1)');
+
+        
+        new Chart(ctx, {
+            type: 'line',  
+            data: {
+                labels: labelsRecaudacionAnual,  
+                datasets: [{
+                    label: 'Recaudación Total ($)',
+                    data: valoresRecaudacionAnual, 
+                    backgroundColor: gradient,  
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',  
+                    pointRadius: 5,  
+                    fill: true,  
+                    tension: 0.4 
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: 'black', font: { size: 14 } } },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+<!-- GRAFICO 3 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosFacturacionSocios = JSON.parse('{{ facturacion_por_socio|escapejs }}');
+        const labelsFacturacionSocios = datosFacturacionSocios.map(item => item.nombre);
+        const valoresFacturacionSocios = datosFacturacionSocios.map(item => item.total_facturado);
+        const backgroundColors = valoresFacturacionSocios.map((_, index) => 
+            `hsl(${index * 36}, 70%, 50%)`
+        );
+
+        const ctx = document.getElementById('graphFacturacionSocios').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',  
+            data: {
+                labels: labelsFacturacionSocios,  
+                datasets: [{
+                    label: 'Facturación Total ($)',
+                    data: valoresFacturacionSocios,
+                    backgroundColor: backgroundColors,  
+                    borderColor: backgroundColors.map(color => color.replace("50%", "40%")),  
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y', 
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }, 
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+<!-- GRAFICO 4 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosTiposSocios = JSON.parse('{{ tipos_socios|escapejs }}');
+
+        const labelsTiposSocios = datosTiposSocios.map(item => item.tipo);
+        const valoresTiposSocios = datosTiposSocios.map(item => item.total_socios);
+
+        const backgroundColors = [
+            '#FF5733', '#33FF57', '#337BFF', '#FFC733', '#FF33A1', 
+            '#A133FF', '#33FFF6', '#FF8C33', '#D433FF', '#33FF8C'
+        ].slice(0, valoresTiposSocios.length);
+
+        const ctx = document.getElementById('graphTiposSocios').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labelsTiposSocios,
+                datasets: [{
+                    data: valoresTiposSocios,
+                    backgroundColor: backgroundColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<!-- GRAFICO 5 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosClientesConsumo = JSON.parse('{{ clientes_mayor_consumo|escapejs }}');
+
+        const labelsClientesConsumo = datosClientesConsumo.map(item => item.nombre);
+        const valoresClientesConsumo = datosClientesConsumo.map(item => item.consumo_total);
+
+        const backgroundColors = labelsClientesConsumo.map((_, index) => 
+            `hsl(${index * 36}, 70%, 50%)`
+        );
+
+        const ctx = document.getElementById('graphClientesConsumo').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsClientesConsumo,
+                datasets: [{
+                    label: 'Consumo Total (m³)',
+                    data: valoresClientesConsumo,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(color => color.replace("50%", "40%")),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+<!-- GRAFICO 6 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosMedidoresConsumo = JSON.parse('{{ medidores_mayor_consumo|escapejs }}');
+
+        const labelsMedidoresConsumo = datosMedidoresConsumo.map(item => item.medidor);
+        const valoresMedidoresConsumo = datosMedidoresConsumo.map(item => item.consumo_total);
+
+        const backgroundColors = labelsMedidoresConsumo.map((_, index) => 
+            `hsl(${index * 36}, 70%, 50%)`
+        );
+
+        const ctx = document.getElementById('graphMedidoresConsumo').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labelsMedidoresConsumo,
+                datasets: [{
+                    data: valoresMedidoresConsumo,
+                    backgroundColor: backgroundColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+<!-- GRAFICO 7 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosDiasAsistencias = JSON.parse('{{ dia_mas_asistencias|escapejs }}');
+
+        const labelsDiasAsistencias = datosDiasAsistencias.map(item => item.dia);
+        const valoresDiasAsistencias = datosDiasAsistencias.map(item => item.total_asistencias);
+
+        const backgroundColors = ['#FF5733', '#33FF57', '#337BFF', '#FFC733', '#FF33A1'];
+
+        const ctx = document.getElementById('graphDiasAsistencias').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labelsDiasAsistencias,
+                datasets: [{
+                    data: valoresDiasAsistencias,
+                    backgroundColor: backgroundColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+<!-- GRAFICO 8 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosCrecimientoFacturacion = JSON.parse('{{ crecimiento_facturacion|escapejs }}');
+
+        const labelsCrecimientoFacturacion = datosCrecimientoFacturacion.map(item => item.anio);
+        const valoresCrecimientoFacturacion = datosCrecimientoFacturacion.map(item => item.total_facturado);
+
+        const ctx = document.getElementById('graphCrecimientoFacturacion').getContext('2d');
+
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(255, 159, 64, 0.6)');
+        gradient.addColorStop(1, 'rgba(255, 159, 64, 0.1)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labelsCrecimientoFacturacion,
+                datasets: [{
+                    label: 'Crecimiento de Facturación ($)',
+                    data: valoresCrecimientoFacturacion,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    pointRadius: 5,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: 'black', font: { size: 14 } } },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+<!-- GRAFICO 9 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosSociosMenosParticipativos = JSON.parse('{{ socios_menos_participativos|escapejs }}');
+
+        const labelsSociosMenosParticipativos = datosSociosMenosParticipativos.map(item => item.nombre);
+        const valoresSociosMenosParticipativos = datosSociosMenosParticipativos.map(item => item.porcentaje);
+
+        const backgroundColors = labelsSociosMenosParticipativos.map((_, index) => 
+            `hsl(${index * 72}, 70%, 50%)`
+        );
+
+        const ctx = document.getElementById('graphSociosMenosParticipativos').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsSociosMenosParticipativos,
+                datasets: [{
+                    label: 'Porcentaje de Participación (%)',
+                    data: valoresSociosMenosParticipativos,
+                    backgroundColor: 'rgba(255, 99, 132, 0.4)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+<!-- GRAFICO 10 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datosSociosMayorRecaudacion = JSON.parse('{{ socios_mayor_recaudacion|escapejs }}');
+
+        const labelsSociosMayorRecaudacion = datosSociosMayorRecaudacion.map(item => item.nombre);
+        const valoresSociosMayorRecaudacion = datosSociosMayorRecaudacion.map(item => item.facturacion_promedio);
+
+        const backgroundColors = labelsSociosMayorRecaudacion.map((_, index) => 
+            `hsl(${index * 72}, 70%, 50%)`
+        );
+
+        const ctx = document.getElementById('graphSociosMayorRecaudacion').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsSociosMayorRecaudacion,
+                datasets: [{
+                    label: 'Facturación Promedio ($)',
+                    data: valoresSociosMayorRecaudacion,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(color => color.replace("50%", "40%")),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+{% endblock %}
